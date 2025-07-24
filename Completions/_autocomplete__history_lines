@@ -143,6 +143,7 @@ _autocomplete__history_lines() {
   #   displays[i]="$out_str"
   #   done
   
+  
   # chinese japanese version
   zmodload zsh/parameter 2>/dev/null
   for i in {1..$#displays}; do
