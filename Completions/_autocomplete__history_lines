@@ -121,7 +121,49 @@ _autocomplete__history_lines() {
       shift $pop $excess displays
 
   # To avoid wrapping, each completion should be one char less than terminal width.
-  displays=( ${(@r:COLUMNS-1:)displays} )
+  # displays=( ${(@r:COLUMNS-1:)displays} )
+  
+  # chinese version
+  # zmodload zsh/parameter 2>/dev/null
+  # for i in {1..$#displays}; do
+  #   local d="$displays[i]"
+  #   local width=0
+  #   local max_width=$((COLUMNS-1))
+  #   local out_str=""
+  #   for ch in ${(s::)d}; do
+  #   if [[ "$ch" == [一-龥] ]]; then
+  #     (( width + 2 > max_width )) && break
+  #     (( width += 2 ))
+  #   else
+  #     (( width + 1 > max_width )) && break
+  #     (( width += 1 ))
+  #   fi
+  #   out_str+="$ch"
+  #   done
+  #   displays[i]="$out_str"
+  #   done
+  
+  # chinese japanese version
+  zmodload zsh/parameter 2>/dev/null
+  for i in {1..$#displays}; do
+    local d="$displays[i]"
+    local width=0
+    local max_width=$((COLUMNS-1))
+    local out_str=""
+    for ch in ${(s::)d}; do
+      # 判断常见宽字符（CJK、日文、韩文、全角标点等）
+      if [[ "$ch" == [一-龥々〆〤ぁ-んァ-ヶーｦ-ﾟ㐀-䶵一-鿋豈-龎] || \
+            "$ch" == [\u2E80-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE10-\uFE19\uFE30-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6] ]]; then
+        (( width + 2 > max_width )) && break
+        (( width += 2 ))
+      else
+        (( width + 1 > max_width )) && break
+        (( width += 1 ))
+      fi
+      out_str+="$ch"
+    done
+    displays[i]="$out_str"
+  done
 
   local -Pa matches=()
   for index in "${(MS)displays[@]##<->}"; do
